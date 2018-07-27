@@ -18,6 +18,9 @@ namespace Test
             packet.WriteULong(5);
             packet.WriteString("text");
 
+            packet.Encrypt(Packet.DefaultKey);
+            packet.Decrypt(Packet.DefaultKey);
+            
             packet.ResetIndex();
 
             Print(packet.GetPacketType() == 0x65);
