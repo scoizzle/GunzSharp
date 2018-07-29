@@ -23,6 +23,38 @@ namespace Gunz {
             Array.Copy(recv_buffer, buffer, recv_buffer.Length);
         }
 
+        public ushort Type {
+            get => GetPacketType();
+            set => SetPacketType(value);
+        }
+
+        public ushort Size {
+            get => GetPacketSize();
+            set => SetPacketSize(value);
+        }
+
+        public ushort Checksum {
+            get => GetChecksum();
+            set => SetChecksum(value);
+        }
+
+        public ushort DataSize {
+            get => GetDataSize();
+            set => SetDataSize(value);
+        }
+
+        public ushort CommandID {
+            get => GetCommandID();
+            set => SetCommandID(value);
+        }
+
+        public byte PacketID {
+            get => GetPacketID();
+            set => SetPacketID(value);
+        }
+        
+        public byte[] GetBuffer() => buffer;
+
         public void ResetIndex() {
             index = HEADER_SIZE + DATA_HEADER_SIZE;
         }
