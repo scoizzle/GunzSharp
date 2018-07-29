@@ -5,6 +5,16 @@ using System.Text;
 namespace Gunz {
     public partial class Packet {
         const byte COMMAND_VERSION = 0x38;
+
+        private static int nSHL;
+        private static int shlMask;
+
+        static Packet() {
+            nSHL = (COMMAND_VERSION % 6) + 1;
+
+            for (var i = 0; i < nSHL; i++)
+                shlMask += (1 << i);
+        }
         
         public static readonly byte[] DefaultKey = {
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -37,12 +47,18 @@ namespace Gunz {
             return (byte)(value);
         }
         
-        private byte Encrypt(byte b, byte k) {
-            var x = ShiftRight(b ^ k, 5);
-            var y = ShiftLeft(b ^ k, 3);
-            var z = x | y;
+        private byte Encrypt(byte s, byte k) {
+            ushort w;
+            byte b, bh;
 
-            return (byte)(z ^ 0xF0);
+            b  = (byte)  (s ^ k);
+            w  = (ushort)(b << nSHL);
+            bh = (byte)  ((w & 0xFF00) >> 8);
+            b  = (byte)  (w & 0xFF);
+
+            b  = (byte)  (b | bh);
+            bh = (byte)  (b ^ 0xF0);
+            return bh;
         }
 
         public void Encrypt(byte[] key) {
@@ -53,12 +69,19 @@ namespace Gunz {
                 buffer[i] = Encrypt(buffer[i], key[i % 0x20]);
         }
 
-        private byte Decrypt(byte b, byte k) {
-            var x = ShiftRight(b ^ 0xf0, 3);
-            var y = b ^ 0xf0 & 7;
-            var z = x | ShiftLeft(y, 5);
+        private byte Decrypt(byte s, byte k) {
+            byte b, bh, d;
 
-            return (byte)(z ^ k);
+            b  = (byte)(s ^ 0xF0);
+            bh = (byte)(b & shlMask);
+
+            bh = (byte)(bh << (8 - nSHL));
+            b  = (byte)(b >> nSHL);
+
+            d  = (byte)(bh | b);
+            d  = (byte)(d ^ k);
+            
+            return d;
         }
 
         public void Decrypt(byte[] key) {
