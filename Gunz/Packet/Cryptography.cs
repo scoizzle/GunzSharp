@@ -17,36 +17,31 @@ namespace Gunz {
         }
         
         public static readonly byte[] DefaultKey = {
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x37, 0x04, 0x5D, 0x2E, 0x43, COMMAND_VERSION, 0x49, 0x53,
-            0x50, 0x05, 0x13, 0xC9, 0x28, 0xA4, 0x4D, 0x05
+            00, 00, 00, 00, 00, 00, 00, 00,
+            00, 00, 00, 00, 00, 00, 00, 00,
+            55, 04, 93, 46, 67, COMMAND_VERSION, 73, 83,
+            80, 05, 19, 201, 40, 164, 77, 05
         };
 
-        private static byte ShiftLeft(int b, int n) {
-            if (n == 0) return (byte)(b);
-            if (n > 8) n = n % 8;
-
-            int value = b;
-
-            while (n-- > 0)
-                value *= 2;
-
-            return (byte)(value);
-        }
-
-        private static byte ShiftRight(int b, int n) {
-            if (n == 0) return (byte)(b);
-            if (n > 8) n = n % 8;
-
-            int value = b;
-
-            while (n-- > 0)
-                value /= 2;
-
-            return (byte)(value);
-        }
+        private static readonly byte[] XORTable = {
+            87, 2, 91, 4, 52, 6, 1, 8, 55, 10, 18, 105, 65, 56, 15, 120
+        };
         
+        public static unsafe void MadeSeedKey(MUID server, MUID client, uint time_stamp) {
+            var ts_bytes = BitConverter.GetBytes(time_stamp);
+            var sv_bytes = BitConverter.GetBytes(server.Low);
+            var ch_bytes = BitConverter.GetBytes(client.High);
+            var cl_bytes = BitConverter.GetBytes(client.Low);
+            
+            Array.Copy(ts_bytes, 0, DefaultKey, 0,  4);
+            Array.Copy(sv_bytes, 0, DefaultKey, 4,  4);
+            Array.Copy(ch_bytes, 0, DefaultKey, 8,  4);
+            Array.Copy(cl_bytes, 0, DefaultKey, 12, 4);
+
+            for (var i = 0; i < XORTable.Length; i++)
+                DefaultKey[i] ^= XORTable[i];
+        }
+
         private byte Encrypt(byte s, byte k) {
             ushort w;
             byte b, bh;
