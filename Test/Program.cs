@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Linq;
+using System.Text;
+
 using Gunz;
 
 namespace Test
@@ -8,12 +12,13 @@ namespace Test
         static void Main(string[] args)
         {
             TestDecode();
+            TestClient();
         }
 
         static void Print(bool success) =>
             Console.WriteLine(success ? "Yay!" : "Boo!");
 
-        static void Test() {
+        static void TestEncodeDecode() {
             Packet packet = new Packet();
 
             packet.SetPacketType(0x65);
@@ -50,6 +55,19 @@ namespace Test
             var time_stamp = packet.GetUInt();
 
             Packet.MadeSeedKey(new MUID(0, uid_server_low), new MUID(uid_client_high, uid_client_low), time_stamp);
+        }
+
+        private static HashAlgorithm md5 = MD5.Create();
+
+        private static string GetHash(string text) {
+            return string.Join(string.Empty, md5.ComputeHash(Encoding.ASCII.GetBytes(text)).Select(b => b.ToString("X2")));
+        }
+
+        static void TestClient() {
+            var client = new Client();
+
+            var packet = client.Match_Login("bullshit", "faggot", 1337, "");
+            
         }
     }
 }
