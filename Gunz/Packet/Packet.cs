@@ -21,5 +21,17 @@ namespace Gunz {
         public void ResetIndex() {
             index = HEADER_SIZE + DATA_HEADER_SIZE;
         }
+
+        public ushort CalculateChecksum(ushort packet_size) {
+            ushort checksum = 0;
+
+            for (var i = 0; i < 4; i++)
+                checksum -= buffer[i];
+
+            for (var i = 6; i < packet_size; i++)
+                checksum += buffer[i];
+
+            return checksum;
+        }
     }
 }
