@@ -18,6 +18,11 @@ namespace Gunz {
             SetPacketSize(HEADER_SIZE + DATA_HEADER_SIZE);
         }
 
+        public Packet(byte[] recv_buffer) {
+            buffer = new byte[ushort.MaxValue];
+            Array.Copy(recv_buffer, buffer, recv_buffer.Length);
+        }
+
         public void ResetIndex() {
             index = HEADER_SIZE + DATA_HEADER_SIZE;
         }
