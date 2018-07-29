@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Gunz {
     public partial class Packet {
-        public const byte COMMAND_VERSION = 0x38;
+        public const byte COMMAND_VERSION = 0x37;
 
         private static int nSHL;
         private static int shlMask;
