@@ -14,8 +14,6 @@ namespace Gunz {
                 return ((PacketHeader*)(ptr))->Size;
         }
 
-        public byte[] GetBuffer() => buffer;
-
         public unsafe ushort GetChecksum() {
             fixed(byte* ptr = buffer)
                 return ((PacketHeader*)(ptr))->Checksum;
